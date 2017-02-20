@@ -1,12 +1,11 @@
 // TNoob - Trivial tool for changing the "Expert Mode" flag of a world
 using System;
 using System.IO;
-using System.Windows.Forms;
 
 public static class Program {
     public static void Main(string[] args) {
         if (args.Length < 1) {
-            MessageBox.Show("Drag and drop the world file!");
+            System.Console.WriteLine("Drag and drop the world file!");
             return;
         }
 
@@ -21,12 +20,12 @@ public static class Program {
         BinaryReader reader = new BinaryReader(new FileStream(source, FileMode.Open));
         int version = reader.ReadInt32();
         if (version < 149) {
-            MessageBox.Show("Error: Outdated terraria version");
+            System.Console.WriteLine("Error: Outdated terraria version");
             return;
         }
         ulong magic = reader.ReadUInt64();
         if ((magic & 72057594037927935uL) != 27981915666277746uL) {
-            MessageBox.Show("Error: Invalid header");
+            System.Console.WriteLine("Error: Invalid header");
             return;
         }
         // Skip other file metadata...
@@ -39,7 +38,7 @@ public static class Program {
         // Skip frame importance...
         reader.ReadBytes(reader.ReadInt16() / 8 + 1);
         if (reader.BaseStream.Position != afterMetadataPos) {
-            MessageBox.Show("After Metadata Position Mismatch: expected " +
+            System.Console.WriteLine("After Metadata Position Mismatch: expected " +
                 afterMetadataPos + ", was " + reader.BaseStream.Position);
             return;
         }
@@ -58,13 +57,13 @@ public static class Program {
         reader.Dispose();
         // Notify the user if the world is changed...
         if (wasExpertMode == expertMode) {
-            MessageBox.Show(expertMode ? "World was already Expert Mode." : "World was already not Expert Mode.");
+            System.Console.WriteLine(expertMode ? "World was already Expert Mode." : "World was already not Expert Mode.");
             return;
         }
         BinaryWriter writer = new BinaryWriter(new FileStream(dest, FileMode.Open));
         writer.BaseStream.Position = expertModeFlagOffset;
         writer.Write(expertMode);
         writer.Dispose();
-        MessageBox.Show(expertMode ? "World is now Expert Mode!" : "World is no longer Expert Mode!");
+        System.Console.WriteLine(expertMode ? "World is now Expert Mode!" : "World is no longer Expert Mode!");
     }
 }
